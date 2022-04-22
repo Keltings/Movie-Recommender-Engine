@@ -45,7 +45,7 @@ def main():
 
     # DO NOT REMOVE the 'Recommender System' option below, however,
     # you are welcome to add more options to enrich your app.
-    page_options = ["Recommender System","Solution Overview"]
+    page_options = ["Recommender System","Solution Overview","About"]
 
     # -------------------------------------------------------------------
     # ----------- !! THIS CODE MUST NOT BE ALTERED !! -------------------
@@ -55,7 +55,12 @@ def main():
         # Header contents
         st.write('# Movie Recommender Engine')
         st.write('### EXPLORE Data Science Academy Unsupervised Predict')
-        st.image('resources/imgs/Image_header.png',use_column_width=True)
+        images = ['resources/imgs/Image_header.png']
+        for i in images:
+
+            st.image(i,use_column_width=True)
+        
+
         # Recommender System algorithm selection
         sys = st.radio("Select an algorithm",
                        ('Content Based Filtering',
@@ -63,9 +68,9 @@ def main():
 
         # User-based preferences
         st.write('### Enter Your Three Favorite Movies')
-        movie_1 = st.selectbox('Fisrt Option',title_list[14930:15200])
-        movie_2 = st.selectbox('Second Option',title_list[25055:25255])
-        movie_3 = st.selectbox('Third Option',title_list[21100:21200])
+        movie_1 = st.selectbox('First Choice',title_list[14930:15200])
+        movie_2 = st.selectbox('Second Choice',title_list[25055:25255])
+        movie_3 = st.selectbox('Third Choice',title_list[21100:21200])
         fav_movies = [movie_1,movie_2,movie_3]
 
         # Perform top-10 movie recommendation generation
@@ -105,7 +110,7 @@ def main():
         st.write("Describe your winning approach on this page")
 
     # You may want to add more sections here for aspects such as an EDA,
-    # or to provide your business pitch.
+    # or to provide your business pitch..
 
 
 if __name__ == '__main__':
