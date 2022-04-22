@@ -122,7 +122,7 @@ def main():
                     for i in new_list:
                         links = url+i
                         movie_links.append(links)
-                    dict_from_list = dict(zip(movie_list, movie_links))
+                    dict_from_list = dict(zip(top_recommendations, movie_links))
                     for items in dict_from_list:
                         st.write(items)
                         st.write("Read more[link](%s)" % dict_from_list[items])
@@ -139,7 +139,7 @@ def main():
         st.write("Describe your winning approach on this page")
 
     # You may want to add more sections here for aspects such as an EDA,
-    # or to provide your business pitch.
+    # or to provide your business pitch....
 
 
 if __name__ == '__main__':
