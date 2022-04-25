@@ -38,7 +38,7 @@ from recommenders.collaborative_based import collab_model
 from recommenders.content_based import content_model
 
 # Data Loading
-title_list = load_movie_titles('resources/data/movies.csv')
+title_list = load_movie_titles('/home/explore-student/unsupervised_data/unsupervised_movie_data/movies.csv')
 
 # App declaration
 def main():
@@ -60,23 +60,7 @@ def main():
 
             st.image(i,use_column_width=True)
         
-        # movie_list = ["Force 10 from Navarone (1978)","We Were Soldiers (2002)","Apocalypse Now (1979)","Windtalkers (2002)"]
-        
-        # new_list = []
-        # for movie in movie_list:
-        #     updated_line = ' '.join(movie.split(' ')[:-1])
-        #     updated_line = "+".join(updated_line.split())
-        #     new_list.append(updated_line)
-        
-        # url = "https://www.imdb.com/search/title/?title="
-        # movie_links = []
-        # for i in new_list:
-        #     links = url+i
-        #     movie_links.append(links)
-        # dict_from_list = dict(zip(movie_list, movie_links))
-        # for items in dict_from_list:
-        #     st.write(items)
-        #     st.write("Read more[link](%s)" % dict_from_list[items])
+       
         # Recommender System algorithm selection
         sys = st.radio("Select an algorithm",
                        ('Content Based Filtering',
@@ -97,8 +81,21 @@ def main():
                         top_recommendations = content_model(movie_list=fav_movies,
                                                             top_n=10)
                     st.title("We think you'll like:")
-                    for i in top_recommendations:
-                        st.subheader(str(i+1)+'. '+j)
+                    new_list = []
+                    for movie in top_recommendations:
+                        updated_line = ' '.join(movie.split(' ')[:-1])
+                        updated_line = "+".join(updated_line.split())
+                        new_list.append(updated_line)
+                        #st.subheader(str(i+1)+'. '+j)
+                    url = "https://www.imdb.com/search/title/?title="
+                    movie_links = []
+                    for i in new_list:
+                        links = url+i
+                        movie_links.append(links)
+                    dict_from_list = dict(zip(top_recommendations, movie_links))
+                    for items in dict_from_list:
+                        st.subheader(items)
+                        st.write("Read more[here](%s)" % dict_from_list[items])
                 except:
                     st.error("Oops! Looks like this algorithm does't work.\
                               We'll need to fix it!")
@@ -116,7 +113,7 @@ def main():
                         updated_line = ' '.join(movie.split(' ')[:-1])
                         updated_line = "+".join(updated_line.split())
                         new_list.append(updated_line)
-                        st.subheader(str(i+1)+'. '+j)
+                        #st.subheader(str(i+1)+'. '+j)
                     url = "https://www.imdb.com/search/title/?title="
                     movie_links = []
                     for i in new_list:
@@ -125,7 +122,7 @@ def main():
                     dict_from_list = dict(zip(top_recommendations, movie_links))
                     for items in dict_from_list:
                         st.write(items)
-                        st.write("Read more[link](%s)" % dict_from_list[items])
+                        st.write("Read more[here](%s)" % dict_from_list[items])
                 except:
                     st.error("Oops! Looks like this algorithm does't work.\
                               We'll need to fix it!")
