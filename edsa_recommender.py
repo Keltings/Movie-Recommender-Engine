@@ -38,19 +38,69 @@ from recommenders.collaborative_based import collab_model
 from recommenders.content_based import content_model
 
 # Data Loading
-title_list = load_movie_titles('/home/explore-student/unsupervised_data/unsupervised_movie_data/movies.csv')
+title_list = load_movie_titles('resources/data/movies.csv')
 
 # App declaration
 def main():
 
     # DO NOT REMOVE the 'Recommender System' option below, however,
     # you are welcome to add more options to enrich your app.
-    page_options = ["Recommender System","Solution Overview","About"]
+    page_options = ["Recommender System","Movie Facts","EDA","About"]
 
     # -------------------------------------------------------------------
     # ----------- !! THIS CODE MUST NOT BE ALTERED !! -------------------
     # -------------------------------------------------------------------
-    page_selection = st.sidebar.selectbox("Choose Option", page_options)
+    page_selection = st.sidebar.radio("Choose Option", page_options)
+    if page_selection== "Movie Facts":
+        #Header Contents
+        st.write("# Movie Facts")
+        images = ['resources/imgs/Movie_facts.jpg']
+        for i in images:
+            st.image(i,use_column_width=True)
+        filters = ["Top rated Movies","High Budget Movies"]
+        filter_selection = st.selectbox("Fact Check",filters)
+        if filter_selection=="Top rated Movies":
+            movie_list = pd.read_csv('resources/data/movies.csv')
+            ratings = pd.read_csv('resources/data/ratings.csv')
+            df = pd.merge(movie_list, ratings, on ='movieId',how='left')
+            movie_ratings= pd.DataFrame(df.groupby('title')['rating'].mean())
+            movie_ratings["Number_Of_Ratings"] = pd.DataFrame(df.groupby('title')['rating'].count())
+            indes = movie_ratings.index
+            new_list=[]
+            for movie in indes:
+                i = ' '.join(movie.split(' ')[-1])
+                new_list.append(i)
+            new_lists = []
+            for i in new_list:
+                if len(i)<2:
+                    empty=i
+                    new_lists.append(empty)
+                elif i[0] == "(" and i[-1]==")" and len(i)==11:
+                    R_strip = i.rstrip(i[-1])
+                    L_strip = R_strip.lstrip(R_strip[0])
+                    spaces = ''.join(L_strip.split())
+                    data_type_int = int(spaces)
+                    new_lists.append(data_type_int) 
+                else:
+                    new_lists.append(i)
+            cnn = []
+            for i in new_lists:
+                if type(i)!=int:
+                    i=0
+                    cnn.append(i)
+                else:
+                    cnn.append(i)
+            movie_ratings["Year"] = cnn
+            def user_interaction(Year,n):
+                list_movies=movie_ratings[movie_ratings['Year']==Year].sort_values('Number_Of_Ratings',ascending=False).index
+                return list_movies[:n]
+            selected_year = st.selectbox("Select Calender Year",range(1900,2020))
+            no_of_outputs = st.radio("Total Number Of Movies",(5,10,20,50))
+            output_list = user_interaction(selected_year,no_of_outputs)
+            for index,items in enumerate(output_list):
+                r=1
+                st.subheader(f'{index+1}.{items}')
+            
     if page_selection == "Recommender System":
         # Header contents
         st.write('# Movie Recommender Engine')
