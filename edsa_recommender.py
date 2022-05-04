@@ -45,17 +45,72 @@ def main():
 
     # DO NOT REMOVE the 'Recommender System' option below, however,
     # you are welcome to add more options to enrich your app.
-    page_options = ["Recommender System","Solution Overview"]
+    page_options = ["Recommender System","Movie Facts","EDA","About"]
 
     # -------------------------------------------------------------------
     # ----------- !! THIS CODE MUST NOT BE ALTERED !! -------------------
     # -------------------------------------------------------------------
-    page_selection = st.sidebar.selectbox("Choose Option", page_options)
+    page_selection = st.sidebar.radio("Choose Option", page_options)
+    if page_selection== "Movie Facts":
+        #Header Contents
+        st.write("# Movie Facts")
+        images = ['resources/imgs/Movie_facts.jpg']
+        for i in images:
+            st.image(i,use_column_width=True)
+        filters = ["Top rated Movies","High Budget Movies"]
+        filter_selection = st.selectbox("Fact Check",filters)
+        if filter_selection=="Top rated Movies":
+            movie_list = pd.read_csv('resources/data/movies.csv')
+            ratings = pd.read_csv('resources/data/ratings.csv')
+            df = pd.merge(movie_list, ratings, on ='movieId',how='left')
+            movie_ratings= pd.DataFrame(df.groupby('title')['rating'].mean())
+            movie_ratings["Number_Of_Ratings"] = pd.DataFrame(df.groupby('title')['rating'].count())
+            indes = movie_ratings.index
+            new_list=[]
+            for movie in indes:
+                i = ' '.join(movie.split(' ')[-1])
+                new_list.append(i)
+            new_lists = []
+            for i in new_list:
+                if len(i)<2:
+                    empty=i
+                    new_lists.append(empty)
+                elif i[0] == "(" and i[-1]==")" and len(i)==11:
+                    R_strip = i.rstrip(i[-1])
+                    L_strip = R_strip.lstrip(R_strip[0])
+                    spaces = ''.join(L_strip.split())
+                    data_type_int = int(spaces)
+                    new_lists.append(data_type_int) 
+                else:
+                    new_lists.append(i)
+            cnn = []
+            for i in new_lists:
+                if type(i)!=int:
+                    i=0
+                    cnn.append(i)
+                else:
+                    cnn.append(i)
+            movie_ratings["Year"] = cnn
+            def user_interaction(Year,n):
+                list_movies=movie_ratings[movie_ratings['Year']==Year].sort_values('Number_Of_Ratings',ascending=False).index
+                return list_movies[:n]
+            selected_year = st.selectbox("Select Calender Year",range(1900,2020))
+            no_of_outputs = st.radio("Total Number Of Movies",(5,10,20,50))
+            output_list = user_interaction(selected_year,no_of_outputs)
+            for index,items in enumerate(output_list):
+                r=1
+                st.subheader(f'{index+1}.{items}')
+            
     if page_selection == "Recommender System":
         # Header contents
         st.write('# Movie Recommender Engine')
         st.write('### EXPLORE Data Science Academy Unsupervised Predict')
-        st.image('resources/imgs/Image_header.png',use_column_width=True)
+        images = ['resources/imgs/Image_header.png']
+        for i in images:
+
+            st.image(i,use_column_width=True)
+        
+       
         # Recommender System algorithm selection
         sys = st.radio("Select an algorithm",
                        ('Content Based Filtering',
@@ -63,9 +118,9 @@ def main():
 
         # User-based preferences
         st.write('### Enter Your Three Favorite Movies')
-        movie_1 = st.selectbox('Fisrt Option',title_list[14930:15200])
-        movie_2 = st.selectbox('Second Option',title_list[25055:25255])
-        movie_3 = st.selectbox('Third Option',title_list[21100:21200])
+        movie_1 = st.selectbox('First Choice',title_list[14930:15200])
+        movie_2 = st.selectbox('Second Choice',title_list[25055:25255])
+        movie_3 = st.selectbox('Third Choice',title_list[21100:21200])
         fav_movies = [movie_1,movie_2,movie_3]
 
         # Perform top-10 movie recommendation generation
@@ -76,8 +131,21 @@ def main():
                         top_recommendations = content_model(movie_list=fav_movies,
                                                             top_n=10)
                     st.title("We think you'll like:")
-                    for i,j in enumerate(top_recommendations):
-                        st.subheader(str(i+1)+'. '+j)
+                    new_list = []
+                    for movie in top_recommendations:
+                        updated_line = ' '.join(movie.split(' ')[:-1])
+                        updated_line = "+".join(updated_line.split())
+                        new_list.append(updated_line)
+                        #st.subheader(str(i+1)+'. '+j)
+                    url = "https://www.imdb.com/search/title/?title="
+                    movie_links = []
+                    for i in new_list:
+                        links = url+i
+                        movie_links.append(links)
+                    dict_from_list = dict(zip(top_recommendations, movie_links))
+                    for items in dict_from_list:
+                        st.subheader(items)
+                        st.write("Read more[here](%s)" % dict_from_list[items])
                 except:
                     st.error("Oops! Looks like this algorithm does't work.\
                               We'll need to fix it!")
@@ -90,8 +158,21 @@ def main():
                         top_recommendations = collab_model(movie_list=fav_movies,
                                                            top_n=10)
                     st.title("We think you'll like:")
-                    for i,j in enumerate(top_recommendations):
-                        st.subheader(str(i+1)+'. '+j)
+                    new_list = []
+                    for movie in top_recommendations:
+                        updated_line = ' '.join(movie.split(' ')[:-1])
+                        updated_line = "+".join(updated_line.split())
+                        new_list.append(updated_line)
+                        #st.subheader(str(i+1)+'. '+j)
+                    url = "https://www.imdb.com/search/title/?title="
+                    movie_links = []
+                    for i in new_list:
+                        links = url+i
+                        movie_links.append(links)
+                    dict_from_list = dict(zip(top_recommendations, movie_links))
+                    for items in dict_from_list:
+                        st.write(items)
+                        st.write("Read more[here](%s)" % dict_from_list[items])
                 except:
                     st.error("Oops! Looks like this algorithm does't work.\
                               We'll need to fix it!")
@@ -105,7 +186,7 @@ def main():
         st.write("Describe your winning approach on this page")
 
     # You may want to add more sections here for aspects such as an EDA,
-    # or to provide your business pitch.
+    # or to provide your business pitch....
 
 
 if __name__ == '__main__':
