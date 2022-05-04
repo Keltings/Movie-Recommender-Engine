@@ -228,14 +228,14 @@ def main():
         if st.checkbox("Ratings"):
             st.subheader("Movie Ratings and Average Ratings")
             with col1:
-                st.image('resources/imgs/ratings.PNG',use_column_width=True)
+                st.image('resources/imgs/ratings.png',use_column_width=True)
 
             with col2:    
                 st.image('resources/imgs/average_ratings.png',use_column_width=True)
 
         # if st.checkbox("correlation"):
         #     st.subheader("Correlation between features")
-        #     st.image('resources/imgs/correlation.png',use_column_width=True)
+        #     st.image('resources/imgs/correlation.png',use_column_width=ie)
         
         if st.checkbox("Actor wordcloud"):
             st.subheader("Top Actors")
