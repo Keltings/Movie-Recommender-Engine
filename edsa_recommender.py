@@ -27,10 +27,20 @@
 """
 # Streamlit dependencies
 import streamlit as st
+import streamlit.components.v1 as components #html extensions
+#st.set_page.config(layout='wide', initial_sidebar_state='expanded')
+from streamlit_option_menu import option_menu
+
+
 
 # Data handling dependencies
 import pandas as pd
 import numpy as np
+
+#visualization tools
+import matplotlib as plt
+import seaborn as sns
+
 
 # Custom Libraries
 from utils.data_loader import load_movie_titles
@@ -39,18 +49,44 @@ from recommenders.content_based import content_model
 
 # Data Loading
 title_list = load_movie_titles('resources/data/movies.csv')
+ratings = pd.read_csv('resources/data/ratings.csv')
+movies =pd.read_csv('resources/data/movies.csv')
+
+# merge the two sets
+merged = ratings.merge(movies, on='movieId', how='inner')
 
 # App declaration
 def main():
 
+    
+
     # DO NOT REMOVE the 'Recommender System' option below, however,
     # you are welcome to add more options to enrich your app.
-    page_options = ["Recommender System","Movie Facts","EDA","About"]
+    #with st.sidebar:
+    page_selection = option_menu(
+            menu_title = None, 
+            options = ["Recommender System","Movie Facts","Exploratory Data Analysis","About"],
+            icons = ['book', 'film', 'camera2','envelope'],
+            menu_icon='cast',
+            default_index= 0,
+            orientation='horizontal',
+            styles={"container":{'padding':'0!important', 'background_color': 'red'},
+                'icon': {'color': 'orange', 'font-size': '15px'},
+                'nav-link': {
+                    'font-size':'15px',
+                    'text-align': 'left',
+                    'margin': '0px',
+                    '--hover-color': '#4BAAFF',
+                },
+                'nav-link-selected': {'background-color': '#6187D2'},
+            }
+        )
+    #page_options = ["Recommender System","Movie Facts","Exploratory Data Analysis","About"]
 
     # -------------------------------------------------------------------
     # ----------- !! THIS CODE MUST NOT BE ALTERED !! -------------------
     # -------------------------------------------------------------------
-    page_selection = st.sidebar.radio("Choose Option", page_options)
+    #page_selection = st.sidebar.radio("Choose Option", page_options)
     if page_selection== "Movie Facts":
         #Header Contents
         st.write("# Movie Facts")
@@ -185,6 +221,59 @@ def main():
         st.title("Solution Overview")
         st.write("Describe your winning approach on this page")
 
+
+    if page_selection == "Exploratory Data Analysis":
+        st.title('Data Visualization Analysis')
+        col1, col2 = st.columns(2)
+        if st.checkbox("Ratings"):
+            st.subheader("Movie Ratings and Average Ratings")
+            with col1:
+                st.image('resources/imgs/ratings.PNG',use_column_width=True)
+
+            with col2:    
+                st.image('resources/imgs/average_ratings.png',use_column_width=True)
+
+        # if st.checkbox("correlation"):
+        #     st.subheader("Correlation between features")
+        #     st.image('resources/imgs/correlation.png',use_column_width=True)
+        
+        if st.checkbox("Actor wordcloud"):
+            st.subheader("Top Actors")
+            st.image('resources/imgs/popular_actors.png',use_column_width=True)
+        
+        if st.checkbox("genres"):
+            st.subheader("Top Genres")
+            st.image('resources/imgs/genre_frequency.png',use_column_width=True)
+            
+                
+        
+        # if st.checkbox("movies released per year"):
+        #     st.subheader("Movies released per year")
+        #     st.image('resources/imgs/release_year.png',use_column_width=True)
+
+        if st.checkbox("tags"):
+            st.subheader("Top tags")
+            st.image('resources/imgs/top_tags.PNG',use_column_width=True)
+
+        if st.checkbox("Directors"):
+            st.subheader("Top 10 Highest Rated Directors")
+            st.image('resources/imgs/top_10_directors.png',use_column_width=True)
+
+    if page_selection == "About":
+        st.subheader("ABOUT THE TEAM")
+        
+        from PIL import Image
+        image1 = Image.open('resources/imgs/Brand2.png')
+        
+        st.image(image1, caption='AI at it\'s Peak')
+        
+        st.info("Who we are")
+		# You can read a markdown file from supporting resources folder
+        st.markdown("We are a team of young data scientists, popular for the numerous statistical and analytical solutions we offer analytical and AI services to a wide range of corporate institutes and organizations. ")
+        from PIL import Image
+        image2= Image.open('resources/imgs/Brand2.png')
+        st.image(image2, caption='Our faces')
+	    # Building out the Data  Exploratory page 
     # You may want to add more sections here for aspects such as an EDA,
     # or to provide your business pitch....
 
