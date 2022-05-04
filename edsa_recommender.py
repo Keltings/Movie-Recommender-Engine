@@ -30,7 +30,7 @@ import streamlit as st
 import streamlit.components.v1 as components #html extensions
 #st.set_page.config(layout='wide', initial_sidebar_state='expanded')
 from streamlit_option_menu import option_menu
-
+import base64
 
 
 # Data handling dependencies
@@ -53,16 +53,36 @@ ratings = pd.read_csv('resources/data/ratings.csv')
 movies =pd.read_csv('resources/data/movies.csv')
 
 # merge the two sets
-merged = ratings.merge(movies, on='movieId', how='inner')
+#merged = ratings.merge(movies, on='movieId', how='inner')
 
 # App declaration
 def main():
-
-    
+    #st.sidebar.markdown('side')
+    st.markdown(
+        """
+        <style>
+        .reportview-container {
+        background: url('resources/imgs/sample.jpg')
+        }
+        .sidebar .sidebar-content {
+        background: url('resources/imgs/sample.jpg')
+        }
+        </style>
+        """,
+    unsafe_allow_html=True
+)
 
     # DO NOT REMOVE the 'Recommender System' option below, however,
     # you are welcome to add more options to enrich your app.
-    #with st.sidebar:
+    with st.sidebar:
+        st.write('Prime Movie Recommendation App')
+        from PIL import Image
+        image2= Image.open('resources/imgs/Brand2.png')
+        st.image(image2, caption='SUREC ENGINES')
+        
+        st.write('Find Us:' 'info@surecteam.com  www.surecengine.com')
+        st.write('+254 704 118713')
+        
     page_selection = option_menu(
             menu_title = None, 
             options = ["Recommender System","Movie Facts","Exploratory Data Analysis","About"],
@@ -70,7 +90,7 @@ def main():
             menu_icon='cast',
             default_index= 0,
             orientation='horizontal',
-            styles={"container":{'padding':'0!important', 'background_color': 'red'},
+            styles={"container":{'padding':'0!important', 'background_color': 'brown'},
                 'icon': {'color': 'orange', 'font-size': '15px'},
                 'nav-link': {
                     'font-size':'15px',
@@ -87,55 +107,7 @@ def main():
     # ----------- !! THIS CODE MUST NOT BE ALTERED !! -------------------
     # -------------------------------------------------------------------
     #page_selection = st.sidebar.radio("Choose Option", page_options)
-    if page_selection== "Movie Facts":
-        #Header Contents
-        st.write("# Movie Facts")
-        images = ['resources/imgs/Movie_facts.jpg']
-        for i in images:
-            st.image(i,use_column_width=True)
-        filters = ["Top rated Movies","High Budget Movies"]
-        filter_selection = st.selectbox("Fact Check",filters)
-        if filter_selection=="Top rated Movies":
-            movie_list = pd.read_csv('resources/data/movies.csv')
-            ratings = pd.read_csv('resources/data/ratings.csv')
-            df = pd.merge(movie_list, ratings, on ='movieId',how='left')
-            movie_ratings= pd.DataFrame(df.groupby('title')['rating'].mean())
-            movie_ratings["Number_Of_Ratings"] = pd.DataFrame(df.groupby('title')['rating'].count())
-            indes = movie_ratings.index
-            new_list=[]
-            for movie in indes:
-                i = ' '.join(movie.split(' ')[-1])
-                new_list.append(i)
-            new_lists = []
-            for i in new_list:
-                if len(i)<2:
-                    empty=i
-                    new_lists.append(empty)
-                elif i[0] == "(" and i[-1]==")" and len(i)==11:
-                    R_strip = i.rstrip(i[-1])
-                    L_strip = R_strip.lstrip(R_strip[0])
-                    spaces = ''.join(L_strip.split())
-                    data_type_int = int(spaces)
-                    new_lists.append(data_type_int) 
-                else:
-                    new_lists.append(i)
-            cnn = []
-            for i in new_lists:
-                if type(i)!=int:
-                    i=0
-                    cnn.append(i)
-                else:
-                    cnn.append(i)
-            movie_ratings["Year"] = cnn
-            def user_interaction(Year,n):
-                list_movies=movie_ratings[movie_ratings['Year']==Year].sort_values('Number_Of_Ratings',ascending=False).index
-                return list_movies[:n]
-            selected_year = st.selectbox("Select Calender Year",range(1900,2020))
-            no_of_outputs = st.radio("Total Number Of Movies",(5,10,20,50))
-            output_list = user_interaction(selected_year,no_of_outputs)
-            for index,items in enumerate(output_list):
-                r=1
-                st.subheader(f'{index+1}.{items}')
+    
             
     if page_selection == "Recommender System":
         # Header contents
@@ -217,12 +189,58 @@ def main():
     # -------------------------------------------------------------------
 
     # ------------- SAFE FOR ALTERING/EXTENSION -------------------
-    if page_selection == "Solution Overview":
-        st.title("Solution Overview")
-        st.write("Describe your winning approach on this page")
-
+    if page_selection== "Movie Facts":
+        #Header Contents
+        st.write("# Movie Facts")
+        images = ['resources/imgs/Movie_facts.jpg']
+        for i in images:
+            st.image(i,use_column_width=True)
+        filters = ["Top rated Movies","High Budget Movies"]
+        filter_selection = st.selectbox("Fact Check",filters)
+        if filter_selection=="Top rated Movies":
+            movie_list = pd.read_csv('resources/data/movies.csv')
+            ratings = pd.read_csv('resources/data/ratings.csv')
+            df = pd.merge(movie_list, ratings, on ='movieId',how='left')
+            movie_ratings= pd.DataFrame(df.groupby('title')['rating'].mean())
+            movie_ratings["Number_Of_Ratings"] = pd.DataFrame(df.groupby('title')['rating'].count())
+            indes = movie_ratings.index
+            new_list=[]
+            for movie in indes:
+                i = ' '.join(movie.split(' ')[-1])
+                new_list.append(i)
+            new_lists = []
+            for i in new_list:
+                if len(i)<2:
+                    empty=i
+                    new_lists.append(empty)
+                elif i[0] == "(" and i[-1]==")" and len(i)==11:
+                    R_strip = i.rstrip(i[-1])
+                    L_strip = R_strip.lstrip(R_strip[0])
+                    spaces = ''.join(L_strip.split())
+                    data_type_int = int(spaces)
+                    new_lists.append(data_type_int) 
+                else:
+                    new_lists.append(i)
+            cnn = []
+            for i in new_lists:
+                if type(i)!=int:
+                    i=0
+                    cnn.append(i)
+                else:
+                    cnn.append(i)
+            movie_ratings["Year"] = cnn
+            def user_interaction(Year,n):
+                list_movies=movie_ratings[movie_ratings['Year']==Year].sort_values('Number_Of_Ratings',ascending=False).index
+                return list_movies[:n]
+            selected_year = st.selectbox("Select Calender Year",range(1900,2020))
+            no_of_outputs = st.radio("Total Number Of Movies",(5,10,20,50))
+            output_list = user_interaction(selected_year,no_of_outputs)
+            for index,items in enumerate(output_list):
+                r=1
+                st.subheader(f'{index+1}.{items}')
 
     if page_selection == "Exploratory Data Analysis":
+        
         st.title('Data Visualization Analysis')
         col1, col2 = st.columns(2)
         if st.checkbox("Ratings"):
@@ -241,7 +259,7 @@ def main():
             st.subheader("Top Actors")
             st.image('resources/imgs/popular_actors.png',use_column_width=True)
         
-        if st.checkbox("genres"):
+        if st.checkbox("Genres"):
             st.subheader("Top Genres")
             st.image('resources/imgs/genre_frequency.png',use_column_width=True)
             
@@ -251,9 +269,6 @@ def main():
         #     st.subheader("Movies released per year")
         #     st.image('resources/imgs/release_year.png',use_column_width=True)
 
-        if st.checkbox("tags"):
-            st.subheader("Top tags")
-            st.image('resources/imgs/top_tags.PNG',use_column_width=True)
 
         if st.checkbox("Directors"):
             st.subheader("Top 10 Highest Rated Directors")
@@ -263,7 +278,7 @@ def main():
         st.subheader("ABOUT THE TEAM")
         
         from PIL import Image
-        image1 = Image.open('resources/imgs/Brand2.png')
+        image1 = Image.open('resources/imgs/Brand.png')
         
         st.image(image1, caption='AI at it\'s Peak')
         
