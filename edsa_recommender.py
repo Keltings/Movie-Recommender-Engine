@@ -184,7 +184,55 @@ def main():
                 st.write("Read more[here](%s)" % dict_from_list[items])
     # You may want to add more sections here for aspects such as an EDA,
     # or to provide your business pitch....
+    if page_selection == "Exploratory Data Analysis":
+        
+        st.title('Data Visualization Analysis')
+        col1, col2 = st.columns(2)
+        if st.checkbox("Ratings"):
+            st.subheader("Movie Ratings and Average Ratings")
+            with col1:
+                st.image('resources/imgs/ratings.png',use_column_width=True)
 
+            with col2:    
+                st.image('resources/imgs/average_ratings.png',use_column_width=True)
+
+        # if st.checkbox("correlation"):
+        #     st.subheader("Correlation between features")
+        #     st.image('resources/imgs/correlation.png',use_column_width=ie)
+        
+        if st.checkbox("Actor wordcloud"):
+            st.subheader("Top Actors")
+            st.image('resources/imgs/popular_actors.png',use_column_width=True)
+        
+        if st.checkbox("Genres"):
+            st.subheader("Top Genres")
+            st.image('resources/imgs/genre_frequency.png',use_column_width=True)
+            
+                
+        
+        # if st.checkbox("movies released per year"):
+        #     st.subheader("Movies released per year")
+        #     st.image('resources/imgs/release_year.png',use_column_width=True)
+
+
+        if st.checkbox("Directors"):
+            st.subheader("Top 10 Highest Rated Directors")
+            st.image('resources/imgs/top_10_directors.png',use_column_width=True)
+
+    if page_selection == "About":
+        st.subheader("ABOUT THE TEAM")
+        
+        from PIL import Image
+        image1 = Image.open('resources/imgs/Brand.png')
+        
+        st.image(image1, caption='AI at it\'s Peak')
+        
+        st.info("Who we are")
+		# You can read a markdown file from supporting resources folder
+        st.markdown("We are a team of young data scientists, popular for the numerous statistical and analytical solutions we offer analytical and AI services to a wide range of corporate institutes and organizations. ")
+        from PIL import Image
+        image2= Image.open('resources/imgs/Brand2.png')
+        st.image(image2, caption='Our faces')
 
 if __name__ == '__main__':
     main()
