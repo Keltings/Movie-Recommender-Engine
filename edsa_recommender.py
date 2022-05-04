@@ -27,6 +27,9 @@
 """
 # Streamlit dependencies
 import streamlit as st
+import streamlit.components.v1 as components #html extensions
+#st.set_page.config(layout='wide', initial_sidebar_state='expanded')
+from streamlit_option_menu import option_menu
 
 # Data handling dependencies
 import pandas as pd
@@ -45,12 +48,79 @@ def main():
 
     # DO NOT REMOVE the 'Recommender System' option below, however,
     # you are welcome to add more options to enrich your app.
-    page_options = ["Recommender System","Movie Facts","EDA","About"]
+    with st.sidebar:
+        page_selection = option_menu(
+                menu_title = "Main Menu", 
+                options = ["Recommender System","Movie Facts","Exploratory Data Analysis","About"],
+                icons = ['gear', 'film', 'camera2','envelope'],
+                menu_icon='cast',
+                default_index= 0,
+                orientation='vertical',
+                styles={"container":{'padding':'0!important', 'background_color': 'red'},
+                    'icon': {'color': 'orange', 'font-size': '15px'},
+                    'nav-link': {
+                        'font-size':'15px',
+                        'text-align': 'left',
+                        'margin': '0px',
+                        '--hover-color': '#4BAAFF',
+                    },
+                    'nav-link-selected': {'background-color': '#6187D2'},
+                }
+            )
 
     # -------------------------------------------------------------------
     # ----------- !! THIS CODE MUST NOT BE ALTERED !! -------------------
     # -------------------------------------------------------------------
-    page_selection = st.sidebar.radio("Choose Option", page_options)
+    #page_selection = st.sidebar.radio("Choose Option", page_options)      
+    if page_selection == "Recommender System":
+        # Header contents
+        st.write('# Movie Recommender Engine')
+        st.write('### EXPLORE Data Science Academy Unsupervised Predict')
+        st.image('resources/imgs/Image_header.png',use_column_width=True)
+        # Recommender System algorithm selection
+        sys = st.radio("Select an algorithm",
+                       ('Content Based Filtering',
+                        'Collaborative Based Filtering'))
+
+        # User-based preferences
+        st.write('### Enter Your Three Favorite Movies')
+        movie_1 = st.selectbox('First Choice',title_list[14930:15200])
+        movie_2 = st.selectbox('Second Choice',title_list[25055:25255])
+        movie_3 = st.selectbox('Third Choice',title_list[21100:21200])
+        fav_movies = [movie_1,movie_2,movie_3]
+
+        # Perform top-10 movie recommendation generation
+        if sys == 'Content Based Filtering':
+            if st.button("Recommend"):
+                try:
+                    with st.spinner('Crunching the numbers...'):
+                        top_recommendations = content_model(movie_list=fav_movies,
+                                                            top_n=10)
+                    st.title("We think you'll like:")
+                    for i, j in enumerate(top_recommendations):
+                        st.subheader(str(i+1)+'. '+j)
+                except:
+                    st.error("Oops! Looks like this algorithm does't work.\
+                              We'll need to fix it!")
+
+
+        if sys == 'Collaborative Based Filtering':
+            if st.button("Recommend"):
+                try:
+                    with st.spinner('Crunching the numbers...'):
+                        top_recommendations = collab_model(movie_list=fav_movies,
+                                                           top_n=10)
+                    st.title("We think you'll like:")
+                    for i, j in enumerate(top_recommendations):
+                        st.subheader(str(i+1)+'. '+j)
+                except:
+                    st.error("Oops! Looks like this algorithm does't work.\
+                              We'll need to fix it!")
+
+
+    # -------------------------------------------------------------------
+
+    # ------------- SAFE FOR ALTERING/EXTENSION -------------------
     if page_selection== "Movie Facts":
         #Header Contents
         st.write("# Movie Facts")
@@ -97,94 +167,21 @@ def main():
             selected_year = st.selectbox("Select Calender Year",range(1900,2020))
             no_of_outputs = st.radio("Total Number Of Movies",(5,10,20,50))
             output_list = user_interaction(selected_year,no_of_outputs)
-            for index,items in enumerate(output_list):
-                r=1
-                st.subheader(f'{index+1}.{items}')
-            
-    if page_selection == "Recommender System":
-        # Header contents
-        st.write('# Movie Recommender Engine')
-        st.write('### EXPLORE Data Science Academy Unsupervised Predict')
-        images = ['resources/imgs/Image_header.png']
-        for i in images:
-
-            st.image(i,use_column_width=True)
-        
-       
-        # Recommender System algorithm selection
-        sys = st.radio("Select an algorithm",
-                       ('Content Based Filtering',
-                        'Collaborative Based Filtering'))
-
-        # User-based preferences
-        st.write('### Enter Your Three Favorite Movies')
-        movie_1 = st.selectbox('First Choice',title_list[14930:15200])
-        movie_2 = st.selectbox('Second Choice',title_list[25055:25255])
-        movie_3 = st.selectbox('Third Choice',title_list[21100:21200])
-        fav_movies = [movie_1,movie_2,movie_3]
-
-        # Perform top-10 movie recommendation generation
-        if sys == 'Content Based Filtering':
-            if st.button("Recommend"):
-                try:
-                    with st.spinner('Crunching the numbers...'):
-                        top_recommendations = content_model(movie_list=fav_movies,
-                                                            top_n=10)
-                    st.title("We think you'll like:")
-                    new_list = []
-                    for movie in top_recommendations:
-                        updated_line = ' '.join(movie.split(' ')[:-1])
-                        updated_line = "+".join(updated_line.split())
-                        new_list.append(updated_line)
-                        #st.subheader(str(i+1)+'. '+j)
-                    url = "https://www.imdb.com/search/title/?title="
-                    movie_links = []
-                    for i in new_list:
-                        links = url+i
-                        movie_links.append(links)
-                    dict_from_list = dict(zip(top_recommendations, movie_links))
-                    for items in dict_from_list:
-                        st.subheader(items)
-                        st.write("Read more[here](%s)" % dict_from_list[items])
-                except:
-                    st.error("Oops! Looks like this algorithm does't work.\
-                              We'll need to fix it!")
-
-
-        if sys == 'Collaborative Based Filtering':
-            if st.button("Recommend"):
-                try:
-                    with st.spinner('Crunching the numbers...'):
-                        top_recommendations = collab_model(movie_list=fav_movies,
-                                                           top_n=10)
-                    st.title("We think you'll like:")
-                    new_list = []
-                    for movie in top_recommendations:
-                        updated_line = ' '.join(movie.split(' ')[:-1])
-                        updated_line = "+".join(updated_line.split())
-                        new_list.append(updated_line)
-                        #st.subheader(str(i+1)+'. '+j)
-                    url = "https://www.imdb.com/search/title/?title="
-                    movie_links = []
-                    for i in new_list:
-                        links = url+i
-                        movie_links.append(links)
-                    dict_from_list = dict(zip(top_recommendations, movie_links))
-                    for items in dict_from_list:
-                        st.write(items)
-                        st.write("Read more[here](%s)" % dict_from_list[items])
-                except:
-                    st.error("Oops! Looks like this algorithm does't work.\
-                              We'll need to fix it!")
-
-
-    # -------------------------------------------------------------------
-
-    # ------------- SAFE FOR ALTERING/EXTENSION -------------------
-    if page_selection == "Solution Overview":
-        st.title("Solution Overview")
-        st.write("Describe your winning approach on this page")
-
+            new_list = []
+            for movie in output_list:
+                updated_line = ' '.join(movie.split(' ')[:-1])
+                updated_line = "+".join(updated_line.split())
+                new_list.append(updated_line)
+                #st.subheader(str(i+1)+'. '+j)
+            url = "https://www.imdb.com/search/title/?title="
+            movie_links = []
+            for i in new_list:
+                links = url+i
+                movie_links.append(links)
+            dict_from_list = dict(zip(output_list, movie_links))
+            for items in dict_from_list:
+                st.subheader(items)
+                st.write("Read more[here](%s)" % dict_from_list[items])
     # You may want to add more sections here for aspects such as an EDA,
     # or to provide your business pitch....
 
