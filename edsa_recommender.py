@@ -80,16 +80,15 @@ def main():
         image2= Image.open('resources/imgs/Brand2.png')
         st.image(image2, caption='SUREC ENGINES')
         
-        st.write('Find Us:' 'info@surecteam.com  www.surecengine.com')
-        st.write('+254 704 118713')
         
-    page_selection = option_menu(
+        
+        page_selection = option_menu(
             menu_title = None, 
             options = ["Recommender System","Movie Facts","Exploratory Data Analysis","About"],
-            icons = ['book', 'film', 'camera2','envelope'],
+            icons = ['gear', 'film', 'camera2','envelope'],
             menu_icon='cast',
             default_index= 0,
-            orientation='horizontal',
+            #orientation='horizontal',
             styles={"container":{'padding':'0!important', 'background_color': 'brown'},
                 'icon': {'color': 'orange', 'font-size': '15px'},
                 'nav-link': {
@@ -276,18 +275,53 @@ def main():
 
     if page_selection == "About":
         st.subheader("ABOUT THE TEAM")
+        col1, col2 = st.columns(2)
+        with col1:
+            from PIL import Image
+            image1 = Image.open('resources/imgs/Brand4.png')
         
-        from PIL import Image
-        image1 = Image.open('resources/imgs/Brand.png')
-        
-        st.image(image1, caption='AI at it\'s Peak')
+            st.image(image1, caption='SUREC ENGINES')
+
+        with col2:
+            st.write('Find Us:' )
+            st.write('+254 704 118713')
+            st.write('info@surecteam.com')
+            st.write('www.surecengine.com')
+            st.write('https://github.com/Keltings/Movie-Recommender-Engine')
+
+
+
         
         st.info("Who we are")
 		# You can read a markdown file from supporting resources folder
         st.markdown("We are a team of young data scientists, popular for the numerous statistical and analytical solutions we offer analytical and AI services to a wide range of corporate institutes and organizations. ")
-        from PIL import Image
-        image2= Image.open('resources/imgs/Brand2.png')
-        st.image(image2, caption='Our faces')
+        
+        col1, col2, col3, col4, col5 = st.columns(5)
+        with col1:
+            from PIL import Image
+            image2= Image.open('resources/imgs/Gathon.jpg')
+            st.image(image2, caption='Milka Gathoni')
+
+        with col2:
+            from PIL import Image
+            image2= Image.open('resources/imgs/mijan.jpeg')
+            st.image(image2, caption='Samuel Mijan')
+
+        with col3:
+            from PIL import Image
+            image2= Image.open('resources/imgs/Jessica.jpg')
+            st.image(image2, caption='Jessica Njuguna')
+
+        with col4:
+            from PIL import Image
+            image2= Image.open('resources/imgs/Sipho.jpg')
+            st.image(image2, caption='Sipho Lukhele')
+
+        with col5:
+            from PIL import Image
+            image2= Image.open('resources/imgs/kelida.jpg')
+            st.image(image2, caption='Kelida Linda')
+        
 	    # Building out the Data  Exploratory page 
     # You may want to add more sections here for aspects such as an EDA,
     # or to provide your business pitch....
