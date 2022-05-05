@@ -53,10 +53,69 @@ def data_preprocessing(subset_size):
         Subset of movies selected for content-based filtering.
 
     """
+    def word_bank_maker(movies_df=movies, imdb_df=imdb):
+        df = pd.merge(movies_df,imdb_df, on = 'movieId')
+        df.drop(columns=['runtime', 'budget'], axis=1, inplace=True)
+
+        #Ensure all datatypes are strings
+
+        cols = ['title_cast', 'plot_keywords', 'genres', 'director']
+        for col in cols:
+            df[col] = df[col].astype(str)
+
+        #Concatenate the names in the director and title_cast columns
+
+        df.director = df.director.apply(lambda name: "".join(name.lower() for name in name.split()))
+        df.title_cast = df.title_cast.apply(lambda name: "".join(name.lower() for name in name.split()))
+
+        #Clean the rows of any special characters (|) and then fix the title cast column
+
+        df.title_cast = df.title_cast.map(lambda x: x.split('|')[:5])
+        df.title_cast = df.title_cast.apply(lambda x: " ".join(x))
+
+        #Clean the plot keywords the same way, retrieving the first five words again
+
+        df.plot_keywords= df.plot_keywords.map(lambda keyword: keyword.split('|')[:5])
+        df.plot_keywords = df.plot_keywords.apply(lambda keyword: " ".join(keyword))
+
+        #Cleaning the genres column
+
+        df.genres = df.genres.map(lambda word: word.lower().split('|'))
+        df.genres = df.genres.apply(lambda word: " ".join(word))
+
+        #Merge the columns for our vectorizer
+
+        df['word_bank'] = ''
+        word_bank = []
+
+        cols = ['title_cast', 'director', 'plot_keywords', 'genres']
+
+        #Generate the word_bank: ie. a list of words to feed into the vectorizer
+
+        for row in range(len(df)):
+            string_ = ''
+            for col in cols:
+                string_ += df.iloc[row][col] + " "        
+            word_bank.append(string_)
+
+        #Append wordbank list as a column to dataframe
+
+        df['word_bank'] = word_bank
+
+        df.set_index('movieId', inplace=True)
+
+        #Drop the columns
+
+        df.drop(columns=['title_cast', 'director', 'plot_keywords', 'genres'], inplace=True)
+
+    return df
+    
+    pre_processed_df = word_bank_maker()
+    
     # Split genre data into individual words.
-    movies['keyWords'] = movies['genres'].str.replace('|', ' ')
+    #movies['keyWords'] = movies['genres'].str.replace('|', ' ')
     # Subset of the data
-    movies_subset = movies[:subset_size]
+    movies_subset = pre_processed_df[:subset_size]
     return movies_subset
 
 # !! DO NOT CHANGE THIS FUNCTION SIGNATURE !!
