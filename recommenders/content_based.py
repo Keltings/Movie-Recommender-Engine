@@ -36,27 +36,87 @@ from sklearn.feature_extraction.text import CountVectorizer
 
 # Importing data
 movies = pd.read_csv('resources/data/movies.csv', sep = ',')
+imdb = pd.read_csv('resources/data/imdb_data.csv', sep = ',')
 ratings = pd.read_csv('resources/data/ratings.csv')
 movies.dropna(inplace=True)
 
+#Data preprocessing function
+
+def word_bank_maker(movies_df=movies, imdb_df=imdb):
+    df = pd.merge(movies_df,imdb_df, on = 'movieId')
+    df.drop(columns=['runtime', 'budget'], axis=1, inplace=True)
+    
+    #Ensure all datatypes are strings
+
+    cols = ['title_cast', 'plot_keywords', 'genres', 'director']
+    for col in cols:
+        df[col] = df[col].astype(str)
+
+    #Concatenate the names in the director and title_cast columns
+
+    df.director = df.director.apply(lambda name: "".join(name.lower() for name in name.split()))
+    df.title_cast = df.title_cast.apply(lambda name: "".join(name.lower() for name in name.split()))
+
+    #Clean the rows of any special characters (|) and then fix the title cast column
+
+    df.title_cast = df.title_cast.map(lambda x: x.split('|')[:5])
+    df.title_cast = df.title_cast.apply(lambda x: " ".join(x))
+
+    #Clean the plot keywords the same way, retrieving the first five words again
+
+    df.plot_keywords= df.plot_keywords.map(lambda keyword: keyword.split('|')[:5])
+    df.plot_keywords = df.plot_keywords.apply(lambda keyword: " ".join(keyword))
+
+    #Cleaning the genres column
+
+    df.genres = df.genres.map(lambda word: word.lower().split('|'))
+    df.genres = df.genres.apply(lambda word: " ".join(word))
+    
+    #Merge the columns for our vectorizer
+
+    df['word_bank'] = ''
+    word_bank = []
+ 
+    cols = ['title_cast', 'director', 'plot_keywords', 'genres']
+
+    #Generate the word_bank: ie. a list of words to feed into the vectorizer
+
+    for row in range(len(df)):
+        string_ = ''
+        for col in cols:
+            string_ += df.iloc[row][col] + " "        
+        word_bank.append(string_)
+
+    #Append wordbank list as a column to dataframe
+
+    df['word_bank'] = word_bank
+
+    df.set_index('movieId', inplace=True)
+
+    #Drop the columns
+
+    df.drop(columns=['title_cast', 'director', 'plot_keywords', 'genres'], inplace=True)
+
+    return df
+
+#Create the dataframe
+df = word_bank_maker()
+
 def data_preprocessing(subset_size):
     """Prepare data for use within Content filtering algorithm.
-
     Parameters
     ----------
     subset_size : int
         Number of movies to use within the algorithm.
-
     Returns
     -------
     Pandas Dataframe
         Subset of movies selected for content-based filtering.
-
     """
     # Split genre data into individual words.
-    movies['keyWords'] = movies['genres'].str.replace('|', ' ')
+    #movies['keyWords'] = movies['genres'].str.replace('|', ' ')
     # Subset of the data
-    movies_subset = movies[:subset_size]
+    movies_subset = df[:subset_size]
     return movies_subset
 
 # !! DO NOT CHANGE THIS FUNCTION SIGNATURE !!
@@ -64,26 +124,23 @@ def data_preprocessing(subset_size):
 def content_model(movie_list,top_n=10):
     """Performs Content filtering based upon a list of movies supplied
        by the app user.
-
     Parameters
     ----------
     movie_list : list (str)
         Favorite movies chosen by the app user.
     top_n : type
         Number of top recommendations to return to the user.
-
     Returns
     -------
     list (str)
         Titles of the top-n movie recommendations to the user.
-
     """
     # Initializing the empty list of recommended movies
     recommended_movies = []
     data = data_preprocessing(27000)
     # Instantiating and generating the count matrix
     count_vec = CountVectorizer()
-    count_matrix = count_vec.fit_transform(data['keyWords'])
+    count_matrix = count_vec.fit_transform(data['word_bank'])
     indices = pd.Series(data['title'])
     cosine_sim = cosine_similarity(count_matrix, count_matrix)
     # Getting the index of the movie that matches the title
