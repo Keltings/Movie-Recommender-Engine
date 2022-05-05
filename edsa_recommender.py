@@ -84,7 +84,7 @@ def main():
         
         page_selection = option_menu(
             menu_title = None, 
-            options = ["Recommender System","Movie Facts","Exploratory Data Analysis", 'About', "Company"],
+            options = ["Recommender System","Movie Facts","Exploratory Data Analysis","About",'Company'],
             icons = ['gear', 'film', 'camera2','envelope','building'],
             menu_icon='cast',
             default_index= 0,
@@ -105,19 +105,12 @@ def main():
     # -------------------------------------------------------------------
     # ----------- !! THIS CODE MUST NOT BE ALTERED !! -------------------
     # -------------------------------------------------------------------
-    #page_selection = st.sidebar.radio("Choose Option", page_options)
-    
-            
+    #page_selection = st.sidebar.radio("Choose Option", page_options)        
     if page_selection == "Recommender System":
         # Header contents
         st.write('# Movie Recommender Engine')
         st.write('### EXPLORE Data Science Academy Unsupervised Predict')
-        images = ['resources/imgs/Image_header.png']
-        for i in images:
-
-            st.image(i,use_column_width=True)
-        
-       
+        st.image('resources/imgs/Image_header.png',use_column_width=True)
         # Recommender System algorithm selection
         sys = st.radio("Select an algorithm",
                        ('Content Based Filtering',
@@ -140,7 +133,8 @@ def main():
                     st.title("We think you'll like:")
                     for i, j in enumerate(top_recommendations):
                         st.subheader(str(i+1)+'. '+j)
-                except:
+                except Exception as e:
+                    st.write(e)
                     st.error("Oops! Looks like this algorithm does't work.\
                               We'll need to fix it!")
 
@@ -157,7 +151,6 @@ def main():
                 except:
                     st.error("Oops! Looks like this algorithm does't work.\
                               We'll need to fix it!")
-
 
     # -------------------------------------------------------------------
 
@@ -247,7 +240,6 @@ def main():
         if st.checkbox("Genres"):
             st.subheader("Top Genres")
             st.image('resources/imgs/genre_frequency.png',use_column_width=True, caption='Drama is the most popular genre among the movies, showing up in over 25000 movies. Comedy and Thillers are next. About 5000 movies were not allocated a specific genre.')
-            
                 
         
         # if st.checkbox("movies released per year"):
@@ -258,9 +250,8 @@ def main():
         if st.checkbox("Directors"):
             st.subheader("Director with highest number of movies")
             st.image('resources/imgs/top_10_directors.png',use_column_width=True, caption = 'Woody Allen is the most occuring director, besides Luc Besson, and Stephen King.')
-
     if page_selection == "Company":
-        st.subheader("THE TEAM")
+        st.subheader("ABOUT THE TEAM")
         col1, col2 = st.columns(2)
         with col1:
             from PIL import Image
@@ -278,17 +269,10 @@ def main():
 
 
         
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            st.info("Meet us")
+        st.info("#### Who we are")
 		# You can read a markdown file from supporting resources folder
-            st.markdown("A team of **Data Scientists**, popular for the numerous statistical and analytical solutions. We offer analytical and AI services to a wide range of corporate institutes and organizations. ")
-        with col2:
-            st.info('Mission')
-            st.markdown('To **keep** the users **engaged** by using **recommendations** and **predict** the rating a user will give a movie as a sure way.')
-        with col3:
-            st.info('Values')
-            st.write('')
+        st.markdown("SUREC is technology company solving recommendation problems for ambitiuos businesses in Africa.\n Our mission is to build algorithms that would aid businesses in Africa to be more profitable, and can compete with businesses around the world.")
+        
         col1, col2, col3, col4, col5 = st.columns(5)
         with col1:
             from PIL import Image
@@ -314,8 +298,6 @@ def main():
             from PIL import Image
             image2= Image.open('resources/imgs/kelida.jpg')
             st.image(image2, caption='Kelida Linda')
-        
-
     if page_selection=='About':
             #markup(page_selection)
         st.write("### Oveview: Flex your Unsupervised Learning skills to generate movie recommendations")
@@ -363,6 +345,7 @@ def main():
 
                 train.csv - The training split of the dataset. Contains user and movie IDs with associated rating data.""")
 
+        
 	    # Building out the Data  Exploratory page 
     # You may want to add more sections here for aspects such as an EDA,
     # or to provide your business pitch....

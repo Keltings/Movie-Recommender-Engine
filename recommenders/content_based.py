@@ -36,50 +36,61 @@ from sklearn.feature_extraction.text import CountVectorizer
 
 # Importing data
 movies = pd.read_csv('resources/data/movies.csv', sep = ',')
-imdb = pd.read_csv('resources/data/imdb_data.csv', sep = ',')
 ratings = pd.read_csv('resources/data/ratings.csv')
+imdb = pd.read_csv('resources/data/imdb_data.csv')
 movies.dropna(inplace=True)
 
-#Data preprocessing function
+def data_preprocessing(subset_size):
+    """Prepare data for use within Content filtering algorithm.
 
-def word_bank_maker(movies_df=movies, imdb_df=imdb):
-    df = pd.merge(movies_df,imdb_df, on = 'movieId')
+    Parameters
+    ----------
+    subset_size : int
+        Number of movies to use within the algorithm.
+
+    Returns
+    -------
+    Pandas Dataframe
+        Subset of movies selected for content-based filtering.
+
+    """
+    df = pd.merge(movies,imdb, on = 'movieId', how = 'left')
     df.drop(columns=['runtime', 'budget'], axis=1, inplace=True)
-    
-    #Ensure all datatypes are strings
+
+        #Ensure all datatypes are strings
 
     cols = ['title_cast', 'plot_keywords', 'genres', 'director']
     for col in cols:
         df[col] = df[col].astype(str)
 
-    #Concatenate the names in the director and title_cast columns
+        #Concatenate the names in the director and title_cast columns
 
     df.director = df.director.apply(lambda name: "".join(name.lower() for name in name.split()))
     df.title_cast = df.title_cast.apply(lambda name: "".join(name.lower() for name in name.split()))
 
-    #Clean the rows of any special characters (|) and then fix the title cast column
+        #Clean the rows of any special characters (|) and then fix the title cast column
 
     df.title_cast = df.title_cast.map(lambda x: x.split('|')[:5])
     df.title_cast = df.title_cast.apply(lambda x: " ".join(x))
 
-    #Clean the plot keywords the same way, retrieving the first five words again
+        #Clean the plot keywords the same way, retrieving the first five words again
 
     df.plot_keywords= df.plot_keywords.map(lambda keyword: keyword.split('|')[:5])
     df.plot_keywords = df.plot_keywords.apply(lambda keyword: " ".join(keyword))
 
-    #Cleaning the genres column
+        #Cleaning the genres column
 
     df.genres = df.genres.map(lambda word: word.lower().split('|'))
     df.genres = df.genres.apply(lambda word: " ".join(word))
-    
-    #Merge the columns for our vectorizer
+
+        #Merge the columns for our vectorizer
 
     df['word_bank'] = ''
     word_bank = []
- 
+
     cols = ['title_cast', 'director', 'plot_keywords', 'genres']
 
-    #Generate the word_bank: ie. a list of words to feed into the vectorizer
+        #Generate the word_bank: ie. a list of words to feed into the vectorizer
 
     for row in range(len(df)):
         string_ = ''
@@ -87,32 +98,18 @@ def word_bank_maker(movies_df=movies, imdb_df=imdb):
             string_ += df.iloc[row][col] + " "        
         word_bank.append(string_)
 
-    #Append wordbank list as a column to dataframe
+        #Append wordbank list as a column to dataframe
 
     df['word_bank'] = word_bank
 
-    df.set_index('movieId', inplace=True)
-
-    #Drop the columns
+        #Drop the columns
 
     df.drop(columns=['title_cast', 'director', 'plot_keywords', 'genres'], inplace=True)
 
-    return df
-
-#Create the dataframe
-df = word_bank_maker()
-
-def data_preprocessing(subset_size):
-    """Prepare data for use within Content filtering algorithm.
-    Parameters
-    ----------
-    subset_size : int
-        Number of movies to use within the algorithm.
-    Returns
-    -------
-    Pandas Dataframe
-        Subset of movies selected for content-based filtering.
-    """
+    #return df
+    
+    #pre_processed_df = word_bank_maker()
+    
     # Split genre data into individual words.
     #movies['keyWords'] = movies['genres'].str.replace('|', ' ')
     # Subset of the data
@@ -124,16 +121,19 @@ def data_preprocessing(subset_size):
 def content_model(movie_list,top_n=10):
     """Performs Content filtering based upon a list of movies supplied
        by the app user.
+
     Parameters
     ----------
     movie_list : list (str)
         Favorite movies chosen by the app user.
     top_n : type
         Number of top recommendations to return to the user.
+
     Returns
     -------
     list (str)
         Titles of the top-n movie recommendations to the user.
+
     """
     # Initializing the empty list of recommended movies
     recommended_movies = []
@@ -147,7 +147,7 @@ def content_model(movie_list,top_n=10):
     idx_1 = indices[indices == movie_list[0]].index[0]
     idx_2 = indices[indices == movie_list[1]].index[0]
     idx_3 = indices[indices == movie_list[2]].index[0]
-    # Creating a Series with the similarity scores in descending order 
+    # Creating a Series with the similarity scores in descending order
     rank_1 = cosine_sim[idx_1]
     rank_2 = cosine_sim[idx_2]
     rank_3 = cosine_sim[idx_3]
