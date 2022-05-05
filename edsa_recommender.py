@@ -84,8 +84,8 @@ def main():
         
         page_selection = option_menu(
             menu_title = None, 
-            options = ["Recommender System","Movie Facts","Exploratory Data Analysis","About"],
-            icons = ['gear', 'film', 'camera2','envelope'],
+            options = ["Recommender System","Movie Facts","Exploratory Data Analysis", 'About', "Company"],
+            icons = ['gear', 'film', 'camera2','envelope','building'],
             menu_icon='cast',
             default_index= 0,
             #orientation='horizontal',
@@ -138,21 +138,8 @@ def main():
                         top_recommendations = content_model(movie_list=fav_movies,
                                                             top_n=10)
                     st.title("We think you'll like:")
-                    new_list = []
-                    for movie in top_recommendations:
-                        updated_line = ' '.join(movie.split(' ')[:-1])
-                        updated_line = "+".join(updated_line.split())
-                        new_list.append(updated_line)
-                        #st.subheader(str(i+1)+'. '+j)
-                    url = "https://www.imdb.com/search/title/?title="
-                    movie_links = []
-                    for i in new_list:
-                        links = url+i
-                        movie_links.append(links)
-                    dict_from_list = dict(zip(top_recommendations, movie_links))
-                    for items in dict_from_list:
-                        st.subheader(items)
-                        st.write("Read more[here](%s)" % dict_from_list[items])
+                    for i, j in enumerate(top_recommendations):
+                        st.subheader(str(i+1)+'. '+j)
                 except:
                     st.error("Oops! Looks like this algorithm does't work.\
                               We'll need to fix it!")
@@ -165,21 +152,8 @@ def main():
                         top_recommendations = collab_model(movie_list=fav_movies,
                                                            top_n=10)
                     st.title("We think you'll like:")
-                    new_list = []
-                    for movie in top_recommendations:
-                        updated_line = ' '.join(movie.split(' ')[:-1])
-                        updated_line = "+".join(updated_line.split())
-                        new_list.append(updated_line)
-                        #st.subheader(str(i+1)+'. '+j)
-                    url = "https://www.imdb.com/search/title/?title="
-                    movie_links = []
-                    for i in new_list:
-                        links = url+i
-                        movie_links.append(links)
-                    dict_from_list = dict(zip(top_recommendations, movie_links))
-                    for items in dict_from_list:
-                        st.write(items)
-                        st.write("Read more[here](%s)" % dict_from_list[items])
+                    for i, j in enumerate(top_recommendations):
+                        st.subheader(str(i+1)+'. '+j)
                 except:
                     st.error("Oops! Looks like this algorithm does't work.\
                               We'll need to fix it!")
@@ -234,9 +208,21 @@ def main():
             selected_year = st.selectbox("Select Calender Year",range(1900,2020))
             no_of_outputs = st.radio("Total Number Of Movies",(5,10,20,50))
             output_list = user_interaction(selected_year,no_of_outputs)
-            for index,items in enumerate(output_list):
-                r=1
-                st.subheader(f'{index+1}.{items}')
+            new_list = []
+            for movie in output_list:
+                updated_line = ' '.join(movie.split(' ')[:-1])
+                updated_line = "+".join(updated_line.split())
+                new_list.append(updated_line)
+                #st.subheader(str(i+1)+'. '+j)
+            url = "https://www.imdb.com/search/title/?title="
+            movie_links = []
+            for i in new_list:
+                links = url+i
+                movie_links.append(links)
+            dict_from_list = dict(zip(output_list, movie_links))
+            for items in dict_from_list:
+                st.subheader(items)
+                st.write("Read more[here](%s)" % dict_from_list[items])
 
     if page_selection == "Exploratory Data Analysis":
         
@@ -245,10 +231,10 @@ def main():
         if st.checkbox("Ratings"):
             st.subheader("Movie Ratings and Average Ratings")
             with col1:
-                st.image('resources/imgs/ratings.png',use_column_width=True)
+                st.image('resources/imgs/ratings.png',use_column_width=True, caption= 'It seems users have a neutral to positive overview of the movies in the dataset')
 
             with col2:    
-                st.image('resources/imgs/average_ratings.png',use_column_width=True)
+                st.image('resources/imgs/average_ratings.png',use_column_width=True, caption= 'The mean rating around 3')
 
         # if st.checkbox("correlation"):
         #     st.subheader("Correlation between features")
@@ -256,11 +242,11 @@ def main():
         
         if st.checkbox("Actor wordcloud"):
             st.subheader("Top Actors")
-            st.image('resources/imgs/popular_actors.png',use_column_width=True)
+            st.image('resources/imgs/popular_actors.png',use_column_width=True, caption='Popular names such as Morgan Freeman,Samuel Jackson-some of the biggest names in Hollywood, starring in blockbuster flicks regularly. A lorge portion of movies have no cast where a title cast should be')
         
         if st.checkbox("Genres"):
             st.subheader("Top Genres")
-            st.image('resources/imgs/genre_frequency.png',use_column_width=True)
+            st.image('resources/imgs/genre_frequency.png',use_column_width=True, caption='Drama is the most popular genre among the movies, showing up in over 25000 movies. Comedy and Thillers are next. About 5000 movies were not allocated a specific genre.')
             
                 
         
@@ -270,11 +256,11 @@ def main():
 
 
         if st.checkbox("Directors"):
-            st.subheader("Top 10 Highest Rated Directors")
-            st.image('resources/imgs/top_10_directors.png',use_column_width=True)
+            st.subheader("Director with highest number of movies")
+            st.image('resources/imgs/top_10_directors.png',use_column_width=True, caption = 'Woody Allen is the most occuring director, besides Luc Besson, and Stephen King.')
 
-    if page_selection == "About":
-        st.subheader("ABOUT THE TEAM")
+    if page_selection == "Company":
+        st.subheader("THE TEAM")
         col1, col2 = st.columns(2)
         with col1:
             from PIL import Image
@@ -292,10 +278,17 @@ def main():
 
 
         
-        st.info("Who we are")
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.info("Meet us")
 		# You can read a markdown file from supporting resources folder
-        st.markdown("We are a team of young data scientists, popular for the numerous statistical and analytical solutions we offer analytical and AI services to a wide range of corporate institutes and organizations. ")
-        
+            st.markdown("A team of **Data Scientists**, popular for the numerous statistical and analytical solutions. We offer analytical and AI services to a wide range of corporate institutes and organizations. ")
+        with col2:
+            st.info('Mission')
+            st.markdown('To **keep** the users **engaged** by using **recommendations** and **predict** the rating a user will give a movie as a sure way.')
+        with col3:
+            st.info('Values')
+            st.write('')
         col1, col2, col3, col4, col5 = st.columns(5)
         with col1:
             from PIL import Image
@@ -322,6 +315,54 @@ def main():
             image2= Image.open('resources/imgs/kelida.jpg')
             st.image(image2, caption='Kelida Linda')
         
+
+    if page_selection=='About':
+            #markup(page_selection)
+        st.write("### Oveview: Flex your Unsupervised Learning skills to generate movie recommendations")
+        
+        # You can read a markdown file from supporting resources folder
+        if st.checkbox("Introduction"):
+            st.subheader("Overview")
+            st.write("""On the internet, where the number of choices is overwhelming, there is a need to filter, prioritize and efficiently deliver relevant information in order to reduce the problem of information overload, which has created a potential problem to many Internet users. Recommender systems solve this problem by searching through large volume of dynamically generated information to provide users with personalized content and services.""")
+            st.write("""Recommender systems are information filtering systems that deal with the problem of information overload by filtering vital information fragment out of large amount of dynamically generated information according to user’s preferences, interest, or observed behaviour about item. Recommender system has the ability to predict whether a particular user would prefer an item or not based on the user’s profile.""")
+            st.write("""Recommender systems are beneficial to both service providers and users. They reduce transaction costs of finding and selecting items in an online shopping environment. Recommendation systems have also proved to improve decision making process and quality.""")
+
+        if st.checkbox("Task"):
+            st.subheader("Unsupervised Learning Prediction")
+            from PIL import Image
+            image2= Image.open('resources/imgs/system.png')
+            st.image(image2, caption='Build a Recommender System to recommend a movie')
+
+            
+
+
+        if st.checkbox("Data"):
+            st.subheader("Data Overview")
+            st.write("""The data consists of 10 million+ observations""")
+
+            st.write("""For the Predictions, we will be using algorithm based on content or collaborative filtering, capable of accurately predicting how a user will rate a movie they have not yet viewed, based on their historical preferences.""")
+
+            st.write("""### Source:""") 
+            st.write("""The data  is maintained by the research team in the Department of Information Techology of the University of Nairobi. Additional movie content data was legally scraped from IMDB""")
+
+
+            st.write("""### Supplied Files:
+                genome_scores.csv - a score mapping the strength between movies and tag-related properties. Read more here
+
+                genome_tags.csv - user assigned tags for genome-related scores
+
+                imdb_data.csv - Additional movie metadata scraped from IMDB using the links.csv file.
+
+                links.csv - File providing a mapping between a MovieLens ID and associated IMDB and TMDB IDs.
+
+                sample_submission.csv - Sample of the submission format for the hackathon.
+
+                tags.csv - User assigned for the movies within the dataset.
+
+                test.csv - The test split of the dataset. Contains user and movie IDs with no rating data.
+
+                train.csv - The training split of the dataset. Contains user and movie IDs with associated rating data.""")
+
 	    # Building out the Data  Exploratory page 
     # You may want to add more sections here for aspects such as an EDA,
     # or to provide your business pitch....
